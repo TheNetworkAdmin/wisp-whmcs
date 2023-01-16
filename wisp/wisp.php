@@ -68,6 +68,19 @@ function wisp_GetUUID(array $params) {
     }
 }
 
+function wisp_GetIP(array $params) {
+    $serverResult = wisp_API($params, 'servers/138?include=allocations', [], 'GET', true);
+    if($serverResult['status_code'] === 200) {
+        if($raw) return $serverResult;
+        else 
+            $serverIP = $serverResult['attributes']['relationships']['allocations']['data'][0]['attributes']['ip'];
+            $serverPort = $serverResult['attributes']['relationships']['allocations']['data'][0]['attributes']['port'];
+            return $serverIP . ":" . $serverPort;
+    } else if($serverResult['status_code'] === 500) {
+        throw new Exception('Failed to get server, panel errored. Check panel logs for more info.');
+    }
+}
+
 function wisp_API(array $params, $endpoint, array $data = [], $method = "GET", $dontLog = false) {
     $url = wisp_GetHostname($params) . '/api/application/' . $endpoint;
 
@@ -618,6 +631,7 @@ function wisp_ClientArea(array $params) {
                 'serviceurl' => $hostname . '/server/' . $serverData['attributes']['identifier'],
                 'serviceUUID' => $serverData['attributes']['uuid'],
                 'serviceName' => $serverData['attributes']['name'],
+                'serviceIP' => wisp_GetIP($params),
             ],
         ];
     } catch (Exception $err) {
@@ -631,12 +645,14 @@ function wisp_AdminServicesTabFields($params) {
     $hostname = wisp_GetHostname($params);
     $serverName = wisp_GetName($params);
     $serverUUID = wisp_GetUUID($params);
+    $serverIP = wisp_GetIP($params);
 
     $fieldsarray = array(
         'Name:' => $serverName, 
         'Manage:' => '<a href="'.$hostname.'/admin/servers/view/' . $serverId . '" target="_blank">Click Here</a>', 
         'ID:' => $serverId, 
         'UUID:' => $serverUUID, 
+        'IP:' => $serverIP, 
        );
        return $fieldsarray;
 }

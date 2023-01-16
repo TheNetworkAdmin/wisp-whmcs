@@ -7,7 +7,7 @@
 
 <div class="row">
     <div class="col-sm-5 text-right">
-        <strong>Server Name:</strong>
+        <strong>Server Name</strong>
     </div>
 
     <div class="col-sm-7 text-left">
@@ -22,6 +22,16 @@
 
     <div class="col-sm-7 text-left">
         {$serviceUUID}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-5 text-right">
+        <strong>IP</strong>
+    </div>
+
+    <div class="col-sm-7 text-left">
+        {$serviceIP}
     </div>
 </div>
 
