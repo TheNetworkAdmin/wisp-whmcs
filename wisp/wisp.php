@@ -48,6 +48,26 @@ function wisp_GetHostname(array $params) {
     return rtrim($hostname, '/');
 }
 
+function wisp_GetName(array $params) {
+    $serverResult = wisp_API($params, 'servers/external/' . $params['serviceid'], [], 'GET', true);
+    if($serverResult['status_code'] === 200) {
+        if($raw) return $serverResult;
+        else return $serverResult['attributes']['name'];
+    } else if($serverResult['status_code'] === 500) {
+        throw new Exception('Failed to get server, panel errored. Check panel logs for more info.');
+    }
+}
+
+function wisp_GetUUID(array $params) {
+    $serverResult = wisp_API($params, 'servers/external/' . $params['serviceid'], [], 'GET', true);
+    if($serverResult['status_code'] === 200) {
+        if($raw) return $serverResult;
+        else return $serverResult['attributes']['uuid'];
+    } else if($serverResult['status_code'] === 500) {
+        throw new Exception('Failed to get server, panel errored. Check panel logs for more info.');
+    }
+}
+
 function wisp_API(array $params, $endpoint, array $data = [], $method = "GET", $dontLog = false) {
     $url = wisp_GetHostname($params) . '/api/application/' . $endpoint;
 
@@ -596,4 +616,20 @@ function wisp_ClientArea(array $params) {
     } catch (Exception $err) {
         // Ignore
     }
+}
+
+function wisp_AdminServicesTabFields($params) {
+
+    $serverId = wisp_GetServerID($params);
+    $hostname = wisp_GetHostname($params);
+    $serverName = wisp_GetName($params);
+    $serverUUID = wisp_GetUUID($params);
+
+    $fieldsarray = array(
+        'Name:' => $serverName, 
+        'Manage:' => '<a href="'.$hostname.'/admin/servers/view/' . $serverId . '" target="_blank">Click Here</a>', 
+        'ID:' => $serverId, 
+        'UUID:' => $serverUUID, 
+       );
+       return $fieldsarray;
 }
