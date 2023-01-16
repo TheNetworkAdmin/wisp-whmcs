@@ -398,6 +398,11 @@ function wisp_CreateAccount(array $params) {
         if($server['status_code'] !== 201) throw new Exception('Failed to create the server, received the error code: ' . $server['status_code'] . '. Enable module debug log for more info.');
 
         unset($params['password']);
+
+        $serverUUID = wisp_GetUUID($params);
+        $serverName = wisp_GetName($params);
+        $params['model']->serviceProperties->save(['Domain' => $serverName . ' ' . $serverUUID]);
+
         Capsule::table('tblhosting')->where('id', $params['serviceid'])->update([
             'username' => '',
             'password' => '',
@@ -611,6 +616,8 @@ function wisp_ClientArea(array $params) {
             'templatefile' => 'clientarea',
             'vars' => [
                 'serviceurl' => $hostname . '/server/' . $serverData['attributes']['identifier'],
+                'serviceUUID' => $serverData['attributes']['uuid'],
+                'serviceName' => $serverData['attributes']['name'],
             ],
         ];
     } catch (Exception $err) {
