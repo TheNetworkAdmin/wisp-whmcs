@@ -69,7 +69,7 @@ function wisp_GetUUID(array $params) {
 }
 
 function wisp_GetIP(array $params) {
-    $serverResult = wisp_API($params, 'servers/138?include=allocations', [], 'GET', true);
+    $serverResult = wisp_API($params, 'servers/' . wisp_GetServerID($params) . '?include=allocations', [], 'GET', true);
     if($serverResult['status_code'] === 200) {
         if($raw) return $serverResult;
         else 
